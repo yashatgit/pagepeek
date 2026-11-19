@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>pagepeek</title>
+<style>
+  :root {
+    --bg: #f6f5f2; --panel: #ffffff; --ink: #1c1b19; --muted: #6b6860; --line: #dedbd3;
+    --accent: #1f5fbf; --accent-ink: #ffffff; --good: #1a7f4b; --bad: #b3391f; --field: #fbfaf8;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #151514; --panel: #1f1f1d; --ink: #ecebe6; --muted: #9c998f; --line: #34332f;
+      --accent: #7fb0ff; --accent-ink: #0d1b33; --good: #5fcf94; --bad: #ff8a70; --field: #191918;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #151514; --panel: #1f1f1d; --ink: #ecebe6; --muted: #9c998f; --line: #34332f;
+    --accent: #7fb0ff; --accent-ink: #0d1b33; --good: #5fcf94; --bad: #ff8a70; --field: #191918;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 32px 16px 64px; background: var(--bg); color: var(--ink);
+    font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  main { max-width: 760px; margin: 0 auto; }
+  header { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 20px; }
+  h1 { font-size: 20px; margin: 0; font-weight: 650; }
+  header p { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
+  #theme {
+    border: 1px solid var(--line); background: var(--panel); color: var(--muted); border-radius: 8px;
+    width: 32px; height: 32px; cursor: pointer; font-size: 15px; line-height: 1; flex: none;
+  }
+  form, #result { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 20px; }
+  label { display: block; font-size: 13px; color: var(--muted); margin: 14px 0 5px; }
+  label:first-child { margin-top: 0; }
+  input[type="text"], input[type="url"], input[type="password"], textarea, select {
+    width: 100%; padding: 9px 11px; border: 1px solid var(--line); border-radius: 8px;
+    background: var(--field); color: var(--ink); font: inherit;
+  }
+  textarea { min-height: 70px; resize: vertical; }
+  input:focus-visible, textarea:focus-visible, select:focus-visible, button:focus-visible {
+    outline: 2px solid var(--accent); outline-offset: 1px;
+  }
+  .modes { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+  .modes button {
+    border: 0; background: var(--field); color: var(--muted); padding: 7px 16px; font: inherit; cursor: pointer;
+  }
+  .modes button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); }
+  .row { display: flex; gap: 16px; align-items: end; flex-wrap: wrap; }
+  .row > div { flex: 1 1 160px; }
+  .check { display: flex; align-items: center; gap: 8px; color: var(--ink); font-size: 14px; margin: 0 0 9px; }
+  .actions { display: flex; align-items: center; gap: 14px; margin-top: 18px; }
+  #run {
+    border: 0; border-radius: 8px; background: var(--accent); color: var(--accent-ink);
+    padding: 10px 22px; font: inherit; font-weight: 600; cursor: pointer;
+  }
+  #run:disabled { opacity: 0.55; cursor: default; }
+  #status { color: var(--muted); font-size: 13px; }
+  .hint { color: var(--muted); font-size: 12px; margin-top: 4px; }
+  #result { margin-top: 16px; }
+  #result[hidden] { display: none; }
+  #verdict { font-size: 12px; font-weight: 650; letter-spacing: 0.04em; text-transform: uppercase; }
+  #verdict.good { color: var(--good); }
+  #verdict.bad { color: var(--bad); }
+  #answer { font-size: 22px; margin: 4px 0 14px; overflow-wrap: anywhere; white-space: pre-wrap; }
+  dl { display: grid; grid-template-columns: max-content 1fr; gap: 3px 14px; margin: 0; font-size: 13px; }
+  dt { color: var(--muted); }
+  dd { margin: 0; overflow-wrap: anywhere; }
+  details { margin-top: 14px; font-size: 13px; }
+  summary { cursor: pointer; color: var(--muted); }
+  pre {
+    background: var(--field); border: 1px solid var(--line); border-radius: 8px; padding: 12px;
+    overflow: auto; font-size: 12px; margin: 8px 0 0;
+  }
+  #shots img { display: block; width: 100%; border: 1px solid var(--line); border-radius: 8px; margin-top: 10px; }
+</style>
+</head>
+<body>
+<main>
+  <header>
+    <div>
+      <h1>pagepeek</h1>
+      <p>Load a web page, then read one element or ask a question about it.</p>
+    </div>
+    <button id="theme" type="button" title="Switch light or dark" aria-label="Switch light or dark">◐</button>
+  </header>
+
+  <form id="form">
+    <label for="token">Token</label>
+    <input id="token" type="password" autocomplete="off" placeholder="PAGEPEEK_TOKEN" required>
+    <div class="hint">Kept in this browser only.</div>
+
+    <label for="url">Page URL</label>
+    <input id="url" type="url" placeholder="https://…" required>
+
+    <label>Read it with</label>
+    <div class="modes" role="group" aria-label="Mode">
+      <button type="button" data-mode="query" aria-pressed="true">A question</button>
+      <button type="button" data-mode="locator" aria-pressed="false">A locator</button>
+    </div>
+
+    <div id="query-fields">
+      <label for="query">Question</label>
+      <textarea id="query" placeholder="What is the price, and is it in stock?"></textarea>
+      <div class="row">
+        <div>
+          <label for="screens">How far down the page to look</label>
+          <select id="screens">
+            <option value="1">1 screen (top only, cheapest)</option>
+            <option value="2">2 screens</option>
+            <option value="4" selected>4 screens (default)</option>
+            <option value="8">8 screens</option>
+            <option value="12">12 screens (most)</option>
+          </select>
+        </div>
+        <label class="check"><input id="shots-on" type="checkbox" checked> Show the screenshots</label>
+      </div>
+    </div>
+
+    <div id="locator-fields" hidden>
+      <label for="locator">CSS selector</label>
+      <input id="locator" type="text" placeholder=".price, #productTitle" spellcheck="false">
+      <div class="hint">Returns the visible text of the first match.</div>
+    </div>
+
+    <div class="actions">
+      <button id="run" type="submit">Read page</button>
+      <span id="status" role="status"></span>
+    </div>
+  </form>
+
+  <section id="result" hidden>
+    <div id="verdict"></div>
+    <div id="answer"></div>
+    <dl id="facts"></dl>
+    <details><summary>Raw response</summary><pre id="raw"></pre></details>
+    <div id="shots"></div>
+  </section>
+</main>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+  const store = {
+    get(key) { try { return localStorage.getItem(key); } catch { return null; } },
+    set(key, value) { try { localStorage.setItem(key, value); } catch {} },
+  };
+
+  const root = document.documentElement;
+  const savedTheme = store.get("theme");
+  if (savedTheme) root.dataset.theme = savedTheme;
+  $("theme").addEventListener("click", () => {
+    const dark = root.dataset.theme
+      ? root.dataset.theme === "dark"
+      : matchMedia("(prefers-color-scheme: dark)").matches;
+    root.dataset.theme = dark ? "light" : "dark";
+    store.set("theme", root.dataset.theme);
+  });
+
+  $("token").value = store.get("token") ?? "";
+
+  let mode = store.get("mode") === "locator" ? "locator" : "query";
+  function showMode() {
+    for (const button of document.querySelectorAll(".modes button")) {
+      button.setAttribute("aria-pressed", String(button.dataset.mode === mode));
+    }
+    $("query-fields").hidden = mode !== "query";
+    $("locator-fields").hidden = mode !== "locator";
+  }
+  for (const button of document.querySelectorAll(".modes button")) {
+    button.addEventListener("click", () => { mode = button.dataset.mode; store.set("mode", mode); showMode(); });
+  }
+  showMode();
+
+  function fact(name, value) {
+    if (value === undefined || value === null || value === "") return;
+    const dt = document.createElement("dt"); dt.textContent = name;
+    const dd = document.createElement("dd"); dd.textContent = String(value);
+    $("facts").append(dt, dd);
+  }
+
+  function show(data, httpStatus, seconds) {
+    const failed = Boolean(data.error);
+    const found = !failed && data.found !== false;
+    $("verdict").textContent = failed ? "Error" : found ? "Found" : "Not found";
+    $("verdict").className = found ? "good" : "bad";
+    $("answer").textContent = failed ? data.error : (data.answer ?? data.text ?? "The selector matched nothing.");
+
+    $("facts").replaceChildren();
+    fact("Page status", data.status ?? (failed ? `service answered ${httpStatus}` : ""));
+    fact("Requests refused by the site", data.refused);
+    fact("Final URL", data.finalUrl);
+    fact("Elements matched", data.matches);
+    fact("Screens read", data.screens);
+    fact("Model", data.model);
+    if (data.usage) fact("Tokens", `${data.usage.input_tokens} in, ${data.usage.output_tokens} out`);
+    fact("Took", `${seconds.toFixed(1)} s`);
+
+    const { screenshots = [], ...rest } = data;
+    $("raw").textContent = JSON.stringify(rest, null, 2);
+    $("shots").replaceChildren(...screenshots.map((b64, i) => {
+      const img = new Image();
+      img.src = `data:image/jpeg;base64,${b64}`;
+      img.alt = `Screen ${i + 1} of the page`;
+      return img;
+    }));
+    $("result").hidden = false;
+  }
+
+  $("form").addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const token = $("token").value.trim();
+    store.set("token", token);
+    const body = { url: $("url").value.trim() };
+    if (mode === "locator") body.locator = $("locator").value;
+    else Object.assign(body, {
+      query: $("query").value,
+      screens: Number($("screens").value),
+      includeScreenshots: $("shots-on").checked,
+    });
+
+    $("run").disabled = true;
+    const started = performance.now();
+    const tick = setInterval(() => {
+      $("status").textContent = `Loading the page… ${((performance.now() - started) / 1000).toFixed(0)} s`;
+    }, 250);
+    try {
+      const response = await fetch("/read", {
+        method: "POST",
+        headers: { authorization: `Bearer ${token}`, "content-type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      show(await response.json(), response.status, (performance.now() - started) / 1000);
+    } catch (error) {
+      show({ error: `Could not reach the service: ${error.message}` }, 0, (performance.now() - started) / 1000);
+    } finally {
+      clearInterval(tick);
+      $("status").textContent = "";
+      $("run").disabled = false;
+    }
+  });
+</script>
+</body>
+</html>

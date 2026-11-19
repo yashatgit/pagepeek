@@ -1,0 +1,13 @@
+{
+  "name": "pagepeek",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "server.mjs",
+  "description": "Loads a web page in a browser and reads one element, or answers a question about it from screenshots.",
+  "scripts": { "start": "electron ." },
+  "dependencies": {
+    "@anthropic-ai/sdk": "1.10.0",
+    "electron": "45.4.1"
+  }
+}

@@ -1,0 +1,23 @@
+# docker compose up -d --build
+#
+# Settings come from a .env file next to this one (copy .env.example). Compose reads it for
+# the ${...} values below; the container itself never sees the file.
+services:
+  pagepeek:
+    build: .
+    image: pagepeek:latest
+    container_name: pagepeek
+    restart: unless-stopped
+    init: true
+    shm_size: 1gb
+    mem_limit: 2g
+    ports:
+      # Reachable from other machines on the network, so the web page works from a laptop or
+      # phone. Every read still needs the token. For this machine only: "127.0.0.1:8787:8787".
+      - "${PAGEPEEK_PORT:-8787}:8787"
+    environment:
+      PAGEPEEK_TOKEN: ${PAGEPEEK_TOKEN:?set PAGEPEEK_TOKEN in .env}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      PAGEPEEK_MODEL: ${PAGEPEEK_MODEL:-}
+      PAGEPEEK_USER_AGENT: ${PAGEPEEK_USER_AGENT:-}
+      PAGEPEEK_HOST_GAP_MS: ${PAGEPEEK_HOST_GAP_MS:-}

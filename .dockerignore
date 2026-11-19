@@ -1,0 +1,8 @@
+# Allow-list, so a local .env can never end up in an image.
+*
+!package.json
+!package-lock.json
+!env.mjs
+!server.mjs
+!ask.mjs
+!index.html
