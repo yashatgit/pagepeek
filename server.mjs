@@ -24,7 +24,10 @@ const TOKEN = readEnv("PAGEPEEK_TOKEN");
 const PORT = Number(readEnv("PAGEPEEK_PORT") ?? 8787);
 const BIND = readEnv("PAGEPEEK_BIND") ?? "127.0.0.1";
 const HOST_GAP_MS = Number(readEnv("PAGEPEEK_HOST_GAP_MS") ?? 4000);
-const USER_AGENT = readEnv("PAGEPEEK_USER_AGENT"); // unset: Electron's own, which names this app
+// Sent instead of Electron's default, which carries this app's name. Chrome 158 on macOS.
+const USER_AGENT =
+  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 " +
+  "(KHTML, like Gecko) Chrome/158.0.0.0 Safari/537.36";
 
 const NAV_TIMEOUT_MS = 45_000;
 const WAIT_FOR_TIMEOUT_MS = 15_000;
@@ -272,7 +275,7 @@ const server = http.createServer(async (req, res) => {
 // The app has no window of its own, so closing the last page window must not quit it.
 app.on("window-all-closed", () => {});
 app.dock?.hide();
-if (USER_AGENT) app.userAgentFallback = USER_AGENT;
+app.userAgentFallback = USER_AGENT;
 
 app.whenReady().then(() => {
   watchResponses(session.fromPartition(PARTITION));

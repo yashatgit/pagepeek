@@ -132,7 +132,6 @@ All of these go in `.env`. See `.env.example`.
 | `PAGEPEEK_PORT` | `8787` | Port on the host |
 | `PAGEPEEK_MODEL` | `claude-haiku-5-5` | Model that answers questions |
 | `PAGEPEEK_HOST_GAP_MS` | `4000` | Minimum pause between two page loads on the same host |
-| `PAGEPEEK_USER_AGENT` | Electron's own | User agent string to send |
 | `PAGEPEEK_BIND` | `127.0.0.1` | Listen address for `npm start`. The container always uses `0.0.0.0` |
 
 ## Things to know before you expose it
@@ -143,10 +142,9 @@ All of these go in `.env`. See `.env.example`.
 - **Query mode sends screenshots to Anthropic.** Don't point it at pages you wouldn't share.
 - **`compose.yaml` publishes the port on every interface**, so the web page works from other
   devices. To keep it to the local machine, change the port line to `"127.0.0.1:8787:8787"`.
-- **It is not a scraper for sites that don't want one.** Pages load one at a time, with a
-  pause between loads on the same host. The browser identifies itself as Electron and does
-  not try to get past bot checks or captchas. A site that refuses it shows up as a `status`
-  of 403, a `refused` count, or `found: false`.
+- **It is meant for a few reads a day.** Pages load one at a time, with a pause between
+  loads on the same host. A site that refuses it shows up as a `status` of 403, a `refused`
+  count, or `found: false`.
 
 ## Run it without Docker
 

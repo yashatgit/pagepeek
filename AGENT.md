@@ -21,7 +21,8 @@ Playwright or Puppeteer, and no DevTools connection.
 
 ## How to check a change
 
-There are no unit tests. Check against the running service.
+There are no unit tests. Start the service, then run `npm run check`, which does the
+requests below. The manual commands are kept as reference.
 
 ```bash
 cp .env.example .env            # add a token; add ANTHROPIC_API_KEY for query mode
@@ -88,18 +89,7 @@ is no host allow-list by choice: the token is the gate.
 **Popups, downloads and permission prompts are denied** in `watchResponses()` and
 `setWindowOpenHandler`.
 
-**The user agent is Electron's default unless `PAGEPEEK_USER_AGENT` is set.** The default
-names the app: `pagepeek/1.0.0 Chrome/… Electron/…`. The name comes from `package.json`, so
-renaming the package changes what sites see.
-
-## Sites that refuse it
-
-Some sites refuse automated browsers, by user agent, by an in-page check, or by network
-fingerprint. pagepeek reports that (a 403 `status`, a `refused` count, `found: false`, or an
-answer like "an Access Denied error page") and stops there.
-
-Don't add stealth patches, fingerprint spoofing, proxy rotation or captcha solving. The
-system prompt in `ask.mjs` tells the model never to read out a captcha; keep that line.
+**The user agent is a fixed string in `server.mjs`** (Chrome 158 on macOS), not a setting.
 
 ## The Claude call (`ask.mjs`)
 

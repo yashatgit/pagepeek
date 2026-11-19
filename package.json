@@ -5,7 +5,7 @@
   "type": "module",
   "main": "server.mjs",
   "description": "Loads a web page in a browser and reads one element, or answers a question about it from screenshots.",
-  "scripts": { "start": "electron ." },
+  "scripts": { "start": "electron .", "check": "node check.mjs" },
   "dependencies": {
     "@anthropic-ai/sdk": "1.10.0",
     "electron": "45.4.1"
