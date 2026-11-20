@@ -3,7 +3,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { readEnv } from "./env.mjs";
 
-const MODEL = readEnv("PAGEPEEK_MODEL") ?? "claude-haiku-5-5";
+const MODEL = readEnv("PAGECRAWL_MODEL") ?? "claude-haiku-5-5";
 
 const SYSTEM = `You answer one question about a web page, using only screenshots of it. The
 images are consecutive screenfuls of the same page from the top down, overlapping slightly. A

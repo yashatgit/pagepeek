@@ -1,4 +1,4 @@
-// check.mjs: checks a running pagepeek. `npm run check`, with the service up (npm start or
+// check.mjs: checks a running pagecrawl. `npm run check`, with the service up (npm start or
 // docker compose up). Query mode is left out because it costs an API call.
 //
 // Needs the network: it loads example.com. example.com changes now and then.
@@ -6,8 +6,8 @@
 
 import { readEnv } from "./env.mjs";
 
-const BASE = readEnv("PAGEPEEK_URL") ?? `http://127.0.0.1:${readEnv("PAGEPEEK_PORT") ?? 8787}`;
-const TOKEN = readEnv("PAGEPEEK_TOKEN") ?? "";
+const BASE = readEnv("PAGECRAWL_URL") ?? `http://127.0.0.1:${readEnv("PAGECRAWL_PORT") ?? 8787}`;
+const TOKEN = readEnv("PAGECRAWL_TOKEN") ?? "";
 
 async function read(body, token = TOKEN) {
   const res = await fetch(new URL("/read", BASE), {

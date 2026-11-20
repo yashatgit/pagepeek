@@ -1,4 +1,4 @@
-# Notes for agents working on pagepeek
+# Notes for agents working on pagecrawl
 
 Read `README.md` first for what the service does and its API. This file holds what the code
 can't tell you: why things are the way they are, what was measured, and how to check a change.
@@ -27,7 +27,7 @@ requests below. The manual commands are kept as reference.
 ```bash
 cp .env.example .env            # add a token; add ANTHROPIC_API_KEY for query mode
 docker compose up -d --build
-T=$(sed -n 's/^PAGEPEEK_TOKEN=//p' .env)
+T=$(sed -n 's/^PAGECRAWL_TOKEN=//p' .env)
 post() { curl -s -X POST http://127.0.0.1:8787/read -H "authorization: Bearer $T" -d "$1"; echo; }
 
 post '{"url":"https://example.com/","locator":"p"}'            # found: true, matches: 6
@@ -36,7 +36,7 @@ post '{"url":"https://example.com/","query":"What does this page say?","screens"
 post '{"url":"https://example.com/","locator":"p","html":true}'  # 400, exactly one mode
 post '{"url":"file:///etc/passwd","locator":"body"}'           # 400, http or https only
 curl -s -X POST http://127.0.0.1:8787/read -H 'authorization: Bearer nope' -d '{}'   # 401
-docker logs pagepeek | tail
+docker logs pagecrawl | tail
 ```
 
 Then open http://127.0.0.1:8787 and run one question with "Show the screenshots" ticked.
@@ -48,7 +48,7 @@ matching nothing there is not a bug.
 ## Decisions and the reasons for them
 
 **One page at a time.** `enqueue()` chains every request onto the previous one, and
-`lastHit` holds a per-host pause (`PAGEPEEK_HOST_GAP_MS`, 4 s). This is deliberate: the
+`lastHit` holds a per-host pause (`PAGECRAWL_HOST_GAP_MS`, 4 s). This is deliberate: the
 service is for a few reads a day, and slow, spaced loads are what a site tolerates.
 
 **The model call runs outside the queue.** The `screenshot` reader only captures. The window
@@ -93,7 +93,7 @@ is no host allow-list by choice: the token is the gate.
 
 ## The Claude call (`ask.mjs`)
 
-- Model `claude-haiku-5-5`, set by `PAGEPEEK_MODEL`.
+- Model `claude-haiku-5-5`, set by `PAGECRAWL_MODEL`.
 - Structured output through `output_config.format` with a JSON schema: `{found, answer}`.
   The reply is parsed with `JSON.parse` from the first `text` block.
 - Thinking is on by default for this model, so `response.content[0]` is not always the text.

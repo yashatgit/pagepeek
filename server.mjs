@@ -1,6 +1,6 @@
-// server.mjs: pagepeek. Loads a web page in a browser window and reads it for the caller.
+// server.mjs: pagecrawl. Loads a web page in a browser window and reads it for the caller.
 //
-//   POST /read    Authorization: Bearer <PAGEPEEK_TOKEN>, JSON body with "url" and exactly
+//   POST /read    Authorization: Bearer <PAGECRAWL_TOKEN>, JSON body with "url" and exactly
 //                 one of:
 //                   "locator": "<css selector>"   the visible text of the first match
 //                   "query": "<a question>"       answered by Claude Haiku from screenshots
@@ -20,14 +20,14 @@ import { app, BrowserWindow, session } from "electron";
 import { readEnv } from "./env.mjs";
 import { askAboutScreenshots, canAsk, describeAskError } from "./ask.mjs";
 
-const TOKEN = readEnv("PAGEPEEK_TOKEN");
-const PORT = Number(readEnv("PAGEPEEK_PORT") ?? 8787);
-const BIND = readEnv("PAGEPEEK_BIND") ?? "127.0.0.1";
-const HOST_GAP_MS = Number(readEnv("PAGEPEEK_HOST_GAP_MS") ?? 4000);
-// Sent instead of Electron's default, which carries this app's name. Chrome 158 on macOS.
-const USER_AGENT =
-  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 " +
-  "(KHTML, like Gecko) Chrome/158.0.0.0 Safari/537.36";
+const TOKEN = readEnv("PAGECRAWL_TOKEN");
+const PORT = Number(readEnv("PAGECRAWL_PORT") ?? 8787);
+const BIND = readEnv("PAGECRAWL_BIND") ?? "127.0.0.1";
+const HOST_GAP_MS = Number(readEnv("PAGECRAWL_HOST_GAP_MS") ?? 4000);
+// Chrome 158's user agent for the platform this runs on, sent instead of Electron's default,
+// which carries this app's name.
+const OS = process.platform === "darwin" ? "Macintosh; Intel Mac OS X 10_15_7" : "X11; Linux x86_64";
+const USER_AGENT = `Mozilla/5.0 (${OS}) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/158.0.0.0 Safari/537.36`;
 
 const NAV_TIMEOUT_MS = 45_000;
 const WAIT_FOR_TIMEOUT_MS = 15_000;
@@ -43,11 +43,11 @@ const SHOT_HEIGHT = 1000;
 const DEFAULT_SCREENS = 4;
 const MAX_SCREENS = 12;
 const SCROLL_PAUSE_MS = 500; // lets lazy-loaded content paint after each scroll
-const PARTITION = "pagepeek"; // in-memory: cookies last until the service restarts
+const PARTITION = "pagecrawl"; // in-memory: cookies last until the service restarts
 const INDEX_HTML = fs.readFileSync(new URL("./index.html", import.meta.url));
 
 if (!TOKEN || TOKEN.length < 24) {
-  console.error("PAGEPEEK_TOKEN is missing or shorter than 24 characters. Set it in .env (see .env.example).");
+  console.error("PAGECRAWL_TOKEN is missing or shorter than 24 characters. Set it in .env (see .env.example).");
   process.exit(1);
 }
 
@@ -280,7 +280,7 @@ app.userAgentFallback = USER_AGENT;
 app.whenReady().then(() => {
   watchResponses(session.fromPartition(PARTITION));
   server.listen(PORT, BIND, () => {
-    console.log(`pagepeek on http://${BIND}:${PORT}, query mode ${canAsk() ? "on" : "off (no ANTHROPIC_API_KEY)"}`);
+    console.log(`pagecrawl on http://${BIND}:${PORT}, query mode ${canAsk() ? "on" : "off (no ANTHROPIC_API_KEY)"}`);
   });
 });
 

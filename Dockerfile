@@ -24,15 +24,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
  # Mesa's software 3D drivers (LLVM alone is 107 MB) come along with GTK. With --disable-gpu
  # nothing loads them: pages are drawn on the CPU by Chromium itself.
  && rm -rf /usr/lib/*-linux-gnu/libLLVM-*.so* /usr/lib/*-linux-gnu/libz3.so* /usr/lib/*-linux-gnu/dri \
- && useradd --uid 1000 --create-home pagepeek
+ && useradd --uid 1000 --create-home pagecrawl
 
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY package.json env.mjs server.mjs ask.mjs index.html ./
 
 # Listen on every interface inside the container. compose.yaml decides what the host exposes.
-ENV PAGEPEEK_BIND=0.0.0.0
-USER pagepeek
+ENV PAGECRAWL_BIND=0.0.0.0
+USER pagecrawl
 EXPOSE 8787
 # --no-sandbox: Chromium's own sandbox needs kernel features Docker withholds from a
 # container, so the container is the isolation here.

@@ -1,4 +1,4 @@
-# pagepeek
+# pagecrawl
 
 A small HTTP service that loads a web page in a real browser and reads it for you. Give it a
 URL and one of three things:
@@ -26,14 +26,14 @@ Query mode needs `ANTHROPIC_API_KEY` in `.env`. Locator and HTML modes work with
 
 ## API
 
-Every read is `POST /read` with `Authorization: Bearer <PAGEPEEK_TOKEN>` and a JSON body
+Every read is `POST /read` with `Authorization: Bearer <PAGECRAWL_TOKEN>` and a JSON body
 holding `url` plus exactly one of `locator`, `query` or `html`.
 
 ### Locator
 
 ```bash
 curl -s -X POST http://localhost:8787/read \
-  -H "authorization: Bearer $PAGEPEEK_TOKEN" \
+  -H "authorization: Bearer $PAGECRAWL_TOKEN" \
   -d '{"url": "https://example.com/", "locator": "p"}'
 ```
 
@@ -55,7 +55,7 @@ it matched; `text` is from the first.
 
 ```bash
 curl -s -X POST http://localhost:8787/read \
-  -H "authorization: Bearer $PAGEPEEK_TOKEN" \
+  -H "authorization: Bearer $PAGECRAWL_TOKEN" \
   -d '{"url": "https://www.amazon.ae/dp/B0FQTBSDRB", "query": "What is the price, and what is the average customer rating out of 5?"}'
 ```
 
@@ -84,7 +84,7 @@ Optional fields:
 
 ```bash
 curl -s -X POST http://localhost:8787/read \
-  -H "authorization: Bearer $PAGEPEEK_TOKEN" \
+  -H "authorization: Bearer $PAGECRAWL_TOKEN" \
   -d '{"url": "https://example.com/", "html": true}'
 ```
 
@@ -127,16 +127,16 @@ All of these go in `.env`. See `.env.example`.
 
 | Variable | Default | Meaning |
 |---|---|---|
-| `PAGEPEEK_TOKEN` | required | Bearer token for `POST /read`, at least 24 characters |
+| `PAGECRAWL_TOKEN` | required | Bearer token for `POST /read`, at least 24 characters |
 | `ANTHROPIC_API_KEY` | none | Turns on query mode |
-| `PAGEPEEK_PORT` | `8787` | Port on the host |
-| `PAGEPEEK_MODEL` | `claude-haiku-5-5` | Model that answers questions |
-| `PAGEPEEK_HOST_GAP_MS` | `4000` | Minimum pause between two page loads on the same host |
-| `PAGEPEEK_BIND` | `127.0.0.1` | Listen address for `npm start`. The container always uses `0.0.0.0` |
+| `PAGECRAWL_PORT` | `8787` | Port on the host |
+| `PAGECRAWL_MODEL` | `claude-haiku-5-5` | Model that answers questions |
+| `PAGECRAWL_HOST_GAP_MS` | `4000` | Minimum pause between two page loads on the same host |
+| `PAGECRAWL_BIND` | `127.0.0.1` | Listen address for `npm start`. The container always uses `0.0.0.0` |
 
 ## Things to know before you expose it
 
-- **The token is the only gate.** pagepeek loads any `http` or `https` URL it is given.
+- **The token is the only gate.** pagecrawl loads any `http` or `https` URL it is given.
   Whoever holds the token can make it load any page the container can reach, including pages
   on your own network.
 - **Query mode sends screenshots to Anthropic.** Don't point it at pages you wouldn't share.
