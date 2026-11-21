@@ -6,7 +6,7 @@ can't tell you: why things are the way they are, what was measured, and how to c
 ## What it is
 
 One Electron app, no build step, plain ESM. Two dependencies: `electron` and
-`@anthropic-ai/sdk`. Four source files, under 400 lines together.
+`@anthropic-ai/sdk`. Five source files, under 450 lines together.
 
 ```
 request -> server.mjs  planRequest()   validate, pick a mode: locator | screenshot | html

@@ -18,11 +18,13 @@ import http from "node:http";
 import crypto from "node:crypto";
 import { app, BrowserWindow, session } from "electron";
 import { readEnv } from "./env.mjs";
+import { syncCookies } from "./cookies.mjs";
 import { askAboutScreenshots, canAsk, describeAskError } from "./ask.mjs";
 
 const TOKEN = readEnv("PAGECRAWL_TOKEN");
 const PORT = Number(readEnv("PAGECRAWL_PORT") ?? 8787);
 const BIND = readEnv("PAGECRAWL_BIND") ?? "127.0.0.1";
+const COOKIES_DIR = readEnv("PAGECRAWL_COOKIES_DIR"); // optional folder of cookie JSON files
 const HOST_GAP_MS = Number(readEnv("PAGECRAWL_HOST_GAP_MS") ?? 4000);
 // Chrome 158's user agent for the platform this runs on, sent instead of Electron's default,
 // which carries this app's name.
@@ -43,7 +45,7 @@ const SHOT_HEIGHT = 1000;
 const DEFAULT_SCREENS = 4;
 const MAX_SCREENS = 12;
 const SCROLL_PAUSE_MS = 500; // lets lazy-loaded content paint after each scroll
-const PARTITION = "pagecrawl"; // in-memory: cookies last until the service restarts
+const PARTITION = "pagecrawl"; // in-memory: cookies last until restart; COOKIES_DIR refills them
 const INDEX_HTML = fs.readFileSync(new URL("./index.html", import.meta.url));
 
 if (!TOKEN || TOKEN.length < 24) {
@@ -132,6 +134,8 @@ async function loadPage(url, mode, options = {}) {
   const waitFor = options.waitFor ?? options.locator;
   const wait = (lastHit.get(url.hostname) ?? 0) + HOST_GAP_MS - Date.now();
   if (wait > 0) await sleep(wait);
+
+  await syncCookies(session.fromPartition(PARTITION), COOKIES_DIR);
 
   const win = new BrowserWindow({
     width: SHOT_WIDTH,

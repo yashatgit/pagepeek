@@ -1,0 +1,33 @@
+{
+  "manifest_version": 3,
+  "name": "Pagecrawl cookies",
+  "version": "1.0.0",
+  "description": "List browser cookies, tick the ones to keep, save them to a folder and copy them to the pagecrawl service.",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAp7n6vpkfbV8CggmCY7EGP9c05Ht5E4WR76QegA7pd3icqXg662XADZtUsbt4I34rCzkDXrlLKQHN5uRjKj0kpro37rzp2Qj5Zl4hlWyTtFSN7akvM1sAnqQAov+npMPlVKd/y+AqyzJRTJW+aeBxtplCyaIwPM1A+5u301ibdh1zRTBpuxo3hqlw2yf+/rMXCJpBhSV6DRQnc+pUgilE+rd9YfnhzyXJTcev/D2IoiTdF/iwZo9kqShVJ7upkrm0IPkIFbNcgtKkuJt8sNMp/kl4oPKYnVnzxPJQl3CksidVc/EgoKJR2Z0CU3KjQtuqRuDBta1KjMKxTMuLEU5mtQIDAQAB",
+  "permissions": [
+    "cookies",
+    "downloads",
+    "history",
+    "nativeMessaging",
+    "storage"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Pagecrawl cookies",
+    "default_icon": {
+      "16": "icons/cookie-16.png",
+      "32": "icons/cookie-32.png",
+      "48": "icons/cookie-48.png",
+      "128": "icons/cookie-128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/cookie-16.png",
+    "32": "icons/cookie-32.png",
+    "48": "icons/cookie-48.png",
+    "128": "icons/cookie-128.png"
+  }
+}

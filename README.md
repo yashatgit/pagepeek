@@ -133,6 +133,7 @@ All of these go in `.env`. See `.env.example`.
 | `PAGECRAWL_MODEL` | `claude-haiku-5-5` | Model that answers questions |
 | `PAGECRAWL_HOST_GAP_MS` | `4000` | Minimum pause between two page loads on the same host |
 | `PAGECRAWL_BIND` | `127.0.0.1` | Listen address for `npm start`. The container always uses `0.0.0.0` |
+| `PAGECRAWL_COOKIES_DIR` | unset | Folder of `*.json` cookie exports (arrays in the shape of Chrome's `cookies.getAll`). Loaded into the browser session before a read, and again whenever a file changes. Compose mounts `./cookiestore` here |
 
 ## Things to know before you expose it
 

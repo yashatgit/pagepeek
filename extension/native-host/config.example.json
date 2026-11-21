@@ -1,0 +1,5 @@
+{
+  "folder": "~/git/pagecrawl/cookiestore",
+  "ssh_host": "your-ssh-alias",
+  "remote_dir": "/path/to/pagecrawl/cookiestore"
+}

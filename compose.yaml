@@ -20,3 +20,7 @@ services:
       ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
       PAGECRAWL_MODEL: ${PAGECRAWL_MODEL:-}
       PAGECRAWL_HOST_GAP_MS: ${PAGECRAWL_HOST_GAP_MS:-}
+      PAGECRAWL_COOKIES_DIR: /cookies
+    volumes:
+      # Optional. Cookie JSON files dropped here are picked up on the next read (see README).
+      - ./cookiestore:/cookies:ro

@@ -28,7 +28,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
-COPY package.json env.mjs server.mjs ask.mjs index.html ./
+COPY package.json env.mjs server.mjs ask.mjs cookies.mjs index.html ./
 
 # Listen on every interface inside the container. compose.yaml decides what the host exposes.
 ENV PAGECRAWL_BIND=0.0.0.0

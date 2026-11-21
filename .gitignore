@@ -1,2 +1,6 @@
 node_modules/
 .env
+cookiestore/
+extension/native-host/config.json
+extension/native-host/host.log
+__pycache__/
